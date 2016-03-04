@@ -1,0 +1,103 @@
+## java接口 ##
+接口的作用:如果几个类有一个相同的方法，但是方法的实现不一样，这个时候就可以用接口的引用来做一个统一的操作对象。比如USB接口的读操作，用接口来实现，不论插上的是手机还是U盘，都统一接口的引用来调用读操作。
+
+### 接口的回调 ###  
+将一个实现了接口的类的对象赋值给 接口变量。那么接口变量就可以调用该类的方法。
+当接口变量调用被类实现的方法时，就是通知相应的对象调用这个方法。也就是接口回调.
+### java回调函数 ###
+- you call me;
+- i will call you back;
+即： A调用B的方法，B里边的方法又反过来调用A的方法
+具体实现：就是在B调用A的方法时传入一个B的对象，在A的方法中做完事后，又通过A的对象来调用B的方法，完成回调。可以通过接口来实现这个过程，直接传入接口的引用，让A类实现接口，接口调用自己的方法，实际就是它的实现类B来完成回调函数。
+具体见例子
+
+```java
+//接口类
+public interface CallBack {
+	/**回调函数*/
+public void excute();
+}
+
+```
+//实现了接口的回调类
+```java
+public class B implements CallBack{
+	@Override
+	public void excute() {
+		System.out.println("执行回调，（B的方法）");
+	}
+
+}
+
+```
+//回调的通知类，完成事件，通知回调
+```java
+public class A {
+	private CallBack callback = null;
+
+	public void setConnect(CallBack callback) {
+		this.callback = callback;
+	}
+/**做某事*/
+	public void doSomething() throws InterruptedException {
+		System.out.println("开始做某事啦。。。。");
+		Thread.sleep(3000);
+		System.out.println("A里边的方法又反过来调用B里边的方法");
+		//i call you back
+		callback.excute();
+		
+	}
+}
+
+
+```
+//测试类
+```java
+public class Test {
+	public static void main(String[] args) {
+		A a=new A();
+		CallBack b=new B();
+		System.out.println(" B调用A的方法");
+		//执行you call me
+		a.setConnect(b);
+		try {
+			a.doSomething();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+```
+输出
+```html
+ B调用A的方法
+开始做某事啦。。。。
+A里边的方法又反过来调用B里边的方法
+执行回调，（B的方法）
+```
+//通过匿名内部类来实现回调
+```java
+public class Test {
+	public static void main(String[] args) throws InterruptedException {
+		A a=new A();
+		//用匿名内部类来实现
+		System.out.println(" B调用A的方法");
+//执行you call me
+		a.setConnect(new CallBack() {
+			@Override
+			public void excute() {
+				System.out.println("通过匿名内部类执行回调");
+			}
+		});
+		a.doSomething();
+	}
+}
+```
+//执行结果
+```html
+ B调用A的方法
+开始做某事啦。。。。
+A里边的方法又反过来调用B里边的方法
+通过匿名内部类执行回调
+
+```
