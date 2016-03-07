@@ -174,3 +174,29 @@ InputStream stream = new FileInputStream("tp.png");
 		Blob image = Hibernate.getLobCreator(session).createBlob(stream, stream.available());
 		news.setImage(image);
 ```
+##映射组成关系##
+**Hibernate 把持久化类的属性分为两种: **
+- 值(value)类型: 没有 OID, 不能被单独持久化, 生命周期依赖于所属的持久化类的对象的生命周期
+
+- 实体(entity)类型: 有 OID, 可以被单独持久化, 有独立的生命周期
+即把一个表中一部分分离出来，提高可重用行。
+
+```xml
+<component name="pay" class="Pay">
+			<parent name="worker" />
+			<property name="mouthPay" column="MOUTH_PAY" type="integer"></property>
+			<property name="yearPay" column="YEAR_PAY" type="integer"></property>
+		</component>
+```
+##映射一对多关联关系##
+在多的一边。hbm.xml中配置
+```xml
+<many-to-one name="customer" class="com.yth.hibernate.map.Customer" >
+            <column name="CUSTOMER" />
+        </many-to-one>
+```
+**注意事项**
+1. 若查询多的一端的对象，默认情况下是不会查询所关联的1的那一端的对象，只有在用到关联对象时才发送相应的SQL语句.
+2. 若在多的一端来查询1的一端时，如果此时session已经关闭，则这个时候会发生LazyInitializationException异常。
+3. 获取多的一端对象时，默认情况下，1的一端是一个代理对象.
+4. 如果1端关联的对象还都在，则不能删除1端。
