@@ -143,9 +143,34 @@ Session 的 save() 方法完成以下操作:
 **Session 的 delete() 方法处理过程**
 	- 计划执行一条 delete 语句
 	- 把对象从 Session 缓存中删除, 该对象进入删除状态.(在flush缓存时发送delete语句中间这段时间再想对该对象进行 save或者update时就会报错，解决办法：下面)
-还有疑问
+**还有疑问**
 
 - Hibernate 的 cfg.xml 配置文件中有一个 hibernate.use_identifier_rollback 属性, 其默认值为 false, 若把它设为 true, 将改变 delete() 方法的运行行为: delete() 方法会把持久化对象或游离对象的 OID 设置为 null, 使它们变为临时对象.
 
 ###evict()###
-将session中的一个持久对象移除。
+将session中的一个持久对象移除。 
+### clear()###
+把缓冲区内的全部对象清除，但不包括操作中的对象。(疑问，操作中的状态指什么是不是如下)
+```java
+		News news = session.load(News.class, 2);
+		System.out.println(news);
+		session.clear();
+		news = session.load(News.class, 2);
+		System.out.println(news);
+``` 
+只发送了一次查询操作，evict也是同样道理？
+
+##Java 时间和日期类型的 Hibernate 映射##
+在 Java 中, 代表时间和日期的类型包括: java.util.Date 和 java.util.Calendar. 此外, 在 JDBC API 中还提供了 3 个扩展了 java.util.Date 类的子类: java.sql.Date, java.sql.Time 和 java.sql.Timestamp, 这三个类分别和标准 SQL 类型中的 DATE, TIME 和 TIMESTAMP 类型对应
+
+![Java 时间和日期类型的 Hibernate 映射](http://i.imgur.com/x50G7QZ.png)
+持久化类中设置为java.util.Date，然后数据库中具体需要那种类型的根据映射类型在hbm.xml中设置
+插入的时候```new Date(new java.util.Date().getTime())``` 
+###存储图片
+图片存储为2进制格式。Blob
+在持久化类中声明private Blob image;
+InputStream stream = new FileInputStream("tp.png");
+```java
+		Blob image = Hibernate.getLobCreator(session).createBlob(stream, stream.available());
+		news.setImage(image);
+```
