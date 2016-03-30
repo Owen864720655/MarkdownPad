@@ -24,7 +24,6 @@ Iterator接口向客户端提供了边里各种类型的集合的统一接口。
 - hasNext():判断集合中的元素是否遍历完毕，如果没有就返回true
 - next():返回下一个元素
 - remove(): 从集合中删除一个由next()方法返回的元素。
-
 ```java
 Iterator<String>iterator=list.listIterator();
 		while (iterator.hasNext()) {

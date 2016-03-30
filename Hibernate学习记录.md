@@ -188,15 +188,289 @@ InputStream stream = new FileInputStream("tp.png");
 			<property name="yearPay" column="YEAR_PAY" type="integer"></property>
 		</component>
 ```
-##映射一对多关联关系##
-在多的一边。hbm.xml中配置
+##映射单向多对一关联关系##
+
+只需从 n 的一端可以访问 1 的一端
+
+在多的一边.hbm.xml中配置
 ```xml
 <many-to-one name="customer" class="com.yth.hibernate.map.Customer" >
-            <column name="CUSTOMER" />
+            <column name="CUSTOMER_ID" />
         </many-to-one>
 ```
+column: 设定和持久化类的属性对应的表的外键
+
 **注意事项**
-1. 若查询多的一端的对象，默认情况下是不会查询所关联的1的那一端的对象，只有在用到关联对象时才发送相应的SQL语句.
+1. 若查询多的一端的对象，默认情况下是不会查询所关联的1的那一端的对象，只有在用到关联对象时才发送相应的SQL语句.延迟加载
+
 2. 若在多的一端来查询1的一端时，如果此时session已经关闭，则这个时候会发生LazyInitializationException异常。
+ 
 3. 获取多的一端对象时，默认情况下，1的一端是一个代理对象.
+
 4. 如果1端关联的对象还都在，则不能删除1端。
+
+##双向1-n##
+域模型:从 Order 到 Customer 的多对一双向关联需要在Order 类中定义一个 Customer 属性, 而在 Customer 类中需定义存放 Order 对象的集合属性
+在多的一头配置和单向多对一一样。
+在一的一端配置
+```xml
+<set name="orders" table="ORDERTEST" inverse="true">
+			<key column="CUSTOMER"></key>
+			<one-to-many class="OrderTest"/>
+		</set>
+```
+name：设置持久化类中Set对象名
+table:n端的表名
+inverse：值为true为被动方，说明负责关联表的关系的是n端。
+key: 设置与所关联的持久化类对应的表的外键，column指定关联表的外键名称。
+one-to-many:1对多，设定集合属性中所关联的持久化类 class为N端全类名
+注意：
+1. 声明集合类型时，需要使用接口类型（Set）因为hibernate在获取集合类型时是hibernate内置的集合类型，而不是java标准的类型。该类型具有**延迟加载和代理对象**的作用。
+
+2. 需要在声明时对集合进行初始化，方式包空指针异常。
+
+3. 两边都是延迟加载，都是在用到对方时才发送SELECT语句
+
+###Set的其他属性###
+order-by:""对查到的集合属性进行排序。可以加入sql函数
+##一对一##
+配置many-to-one的一端，都有一个外键。插入的时候先插入另一端再插入many端，这样不会发送update语句。查询的时候，只查询本对象，所关联的对象只有当用的时候才会发送select语句
+<many-to-one属性的类
+###基于外键的###
+
+一端配置
+```xml
+<many-to-one name="manager" class="Manager">
+			<column name="MANAGE_ID" unique="true"></column>
+		</many-to-one>
+```
+增加unique=“true” 属性来表示为1-1关联
+另一端
+```xml
+<one-to-one name="department" class="Department" property-ref="mag"></one-to-one>
+```
+用 property-ref 属性指定使用被关联实体主键以外的字段作为关联字段(就是指定关联字段 ,所关联表的和他同类的对象名称)
+就是上面，Department中Manager对象名称。
+
+注意：
+查询操作时，配置many-to-one的一端，在用到所关联的对象时才会发送SELECT语句，但是配置了one-to-one一端的只要查询了就会把他所关联的对象全部查询出来。
+###基于主键的###
+基于主键的映射策略:指一端的主键生成器使用 foreign 策略,表明根据”对方”的主键来生成自己的主键，自己并不能独立生成主键. <param> 子元素指定使用当前持久化类的哪个属性作为 “对方”
+```xml
+<id name="id" type="java.lang.Integer">
+			<column name="ID" />
+			<!-- foreign根据对方的主键来生成自己的主键 param标示使用当前持久化类的哪个属性作为对方 即根据哪个来生成主键 -->
+			<generator class="foreign">
+			<param name="property">manager</param>
+			</generator>
+		</id>
+```
+并在当前的.hbm.xml中配置one-one
+```xml
+<one-to-one name="manager" class="Manager" constrained="true"></one-to-one>
+```
+one-to-one属性还应增加 constrained=“true” 
+constrained(约束):指定为当前持久化类对应的数据库表的主键添加一个外键约束，引用被关联的对象(“对方”)所对应的数据库表主键
+
+另一端就是配置
+```xml
+<one-to-one name="department" class="Department"></one-to-one>
+```
+注意：
+1. 在插入时都是先插入标准配置的，即主动生成主键的一方。因为另一方没有主键
+2. 在查询时，主动的一方会有一个左外连接把所关联的对象也都查出来，因为他里面没有一个外键指向所关联的对象，不知道是哪一个，所有都查出来了。
+3. 被动的一方默认只查询他所在的表，只有用到所关联的表时才会全部查询.
+
+##多对多##
+例子：现实生活中的类别和商品
+
+n-n双向配置。
+代码
+```xml
+ <set name="category" table="CATEGORY_ITEM" inverse="true">
+            <key>
+            <!-- 这个 配置的是category端在中间表中的列名-->
+                <column name="I_ID" />
+            </key>
+            <!-- 配置的是Item在中间表中的列的名称 -->
+            <many-to-many class="Category" column="C_ID"></many-to-many>
+        </set>
+```
+另一端
+```xml
+ <set name="items" table="CATEGORY_ITEM">
+            <key>
+            <!-- 这个 配置的是category端在中间表中的列名-->
+                <column name="C_ID" />
+            </key>
+            <!-- 配置的是Item在中间表中的列的名称 -->
+            <many-to-many class="Item" column="I_ID"></many-to-many>
+        </set>
+```
+**set中table**属性是连接表的表名，必须一样
+**key:colum**属性指该类对应的表在 连接表中的列属性名.
+**many-to-many**配置，Set中类的对象.column属性用于指定，他在连接表中列属性名
+**inverse="true"**在一端中设置他来维护关联关系.
+两个表的配置，交叉相同
+
+如果要配置单向的n-n，只用在一个.hbm.xml中配置set即可
+
+##映射的继承关系##
+
+##HQL查询##
+HQL 检索方式包括以下步骤:
+1. 通过 Session 的 createQuery() 方法创建一个 Query 对象, 它包括一个 HQL 查询语句. HQL 查询语句中可以包含命名参数
+2. 动态绑定参数
+3. 调用 Query 相关方法执行查询语句. 
+
+```java
+		 //建立hal语句
+		 String hql = "FROM Class c WHERE c.id=?";
+		// 创建query
+		 Query query = session.createQuery(hql);
+		// 设置query参数
+		 query.setInteger(0, 2);
+		// 查询
+		 java.util.List<Class> ces = query.list();
+```
+
+
+###HQL vs SQL:###
+HQL 查询语句是面向对象的, Hibernate 负责解析 HQL 查询语句, 然后根据对象-关系映射文件中的映射信息, 把 HQL 查询语句翻译成相应的 SQL 语句. **HQL 查询语句中的主体是域模型中的类及类的属性
+SQL 查询语句是与关系数据库绑定在一起的. SQL 查询语句中的主体是数据库表及表的字段.** 
+##在映射文件中定义命名查询语句##
+Hibernate 允许在映射文件中定义字符串形式的查询语句. 也就是把HQL语句放到映射文件中。
+
+<query> 元素用于定义一个 HQL 查询语句, 它和 <class> 元素并列. 
+```xml
+<query name="studentSearch"><![CDATA[FROM Student st WHERE st.id>=:studentId ]]></query>
+```
+在程序中通过 Session 的``` getNamedQuery() ```方法获取查询语句对应的 Query 对象. 
+```java
+Query query = session.getNamedQuery("studentSearch");
+
+		java.util.List<Student> stes = query.setInteger("studentId", 5).list();
+
+		System.out.println(stes.get(0).getName());
+```
+##投影查询##
+**投影查询**: 查询结果仅包含实体的部分属性. 通过 SELECT 关键字实现
+
+Query 的 list() 方法返回的集合中包含的是数组类型的元素, 每个对象数组代表查询结果的一条记录
+查询多个值：
+```java
+		String hql = "SELECT st.name,st.age FROM Student st WHERE st.id>:studentId ";
+
+		Query query = session.createQuery(hql);
+
+		java.util.List<Object[]> result = query.setInteger("studentId", 20).list();
+
+		System.out.println(result.size());
+
+		for( Object[] obj: result){
+			System.out.println(Arrays.asList(obj));
+		}
+```
+
+查询单个值
+```java
+		String hql = "SELECT st.name FROM Student st WHERE st.id>:studentId ";
+		Query query = session.createQuery(hql);
+
+		java.util.List<Object[]> result = query.setInteger("studentId", 20).list();
+
+		System.out.println(result.size());
+
+		for( Object obj: result){
+			System.out.println(Arrays.asList(obj));
+		}
+```
+##疑问
+查询单个值时List里边设为Object[]或者Object都可以，但是for循环里边必须是Obj
+而查询多个值时List和for循环里边都必须是Object[];
+
+可以在持久化类中定义一个**对象的构造器**来包装投影查询返回的记录, 使程序代码能完全运用面向对象的语义来访问查询结果集. 
+```java
+		String hql = "SELECT new Student(st.name,st.age) FROM Student st WHERE st.id>:studentId ";
+		Query query = session.createQuery(hql);
+		java.util.List<Student> result = query.setInteger("studentId", 20).list();
+		System.out.println(result.size());
+		for (Student obj : result) {
+			System.out.println(obj.getName()+" 年龄"+obj.getAge());
+		}
+```
+如果要获取没有查询的属性就会返回null比如上面的```obj.getId()```
+
+##报表查询##
+报表查询用于对数据分组和统计, 与 SQL 一样, HQL 利用 **GROUP BY** 关键字对数据分组, 用 **HAVING** 关键字对分组数据设定约束条件.
+在 HQL 查询语句中可以调用以下聚集函数
+- count()
+- min()
+- max()
+- sum()
+- avg()
+ 
+```java
+String hql = "SELECT min(st.age),max(st.age)FROM Student st GROUP BY st.className " + "HAVING min(st.age)>20";
+		Query query = session.createQuery(hql);
+		java.util.List<Object[]> result = query.list();
+		for (Object[] obj : result) {
+			System.out.println(Arrays.asList(obj));
+		}
+```
+##左外连接/迫切左外连接##
+###迫切左外连接:
+**LEFT JOIN FETCH **关键字表示迫切左外连接检索策略.
+list() 方法返回的集合中存放**实体对象的引用**, 每个 Class 对象关联的 Employee  集合都被初始化, 存放所有关联的 Student 的实体对象. 
+```java
+		String hql = "SELECT DISTINCT c FROM Class c LEFT JOIN FETCH c.students";
+		Query query = session.createQuery(hql);
+		java.util.List<Class> c = query.list();
+		for (Class s : c) {
+			for (Student st : s.getStudents()) {
+				System.out.println(st.getName());
+			}
+		}
+```
+查询结果中可能会包含重复元素
+###左外连接
+- LEFT JOIN 关键字表示左外连接查询.  
+- list() 方法返回的集合中存放的是对象数组类型
+- 根据配置文件来决定 Employee 集合的检索策略. fetch/lazy..
+- 如果希望 list() 方法返回的集合中仅包含 Class 对象, 可以在HQL 查询语句中使用 SELECT 关键字
+//只查询Class对象
+```java
+String hql = "SELECT DISTINCT c FROM Class c LEFT JOIN c.students";
+		Query query = session.createQuery(hql);
+		java.util.List<Class> result = query.list();
+		for (Class obj : result) {
+			System.out.println(obj.getName()+" 学生数"+obj.getStudents().size());
+		}
+
+```
+//默认情况下返回的是一个对象数组
+```java
+String hql = "FROM Class c LEFT JOIN c.students";
+		Query query = session.createQuery(hql);
+		java.util.List<Object[]> result = query.list();
+		for (Object[] obj : result) {
+			System.out.println(Arrays.asList(obj));
+		}
+```
+##迫切做内连接
+###迫切内连接 ###
+(不包括左表不符合条件的记录):
+INNER JOIN FETCH 关键字表示迫切内连接, 也可以省略 INNER 关键字
+list() 方法返回的集合中存放** Department 对象**的引用, 每个 Department 对象的 Employee 集合都被初始化, 存放所有关联的 Employee 对象
+
+###内连接:
+
+INNER JOIN 关键字表示内连接, 也可以省略 INNER 关键字
+list() 方法的集合中存放的每个元素对应查询结果的一条记录, 每个元素都**是对象数组类型**
+如果希望 list() 方法的返回的集合仅包含 Department  对象, 可以在 HQL 查询语句中使用 SELECT 关键字
+
+##QBC 检索
+
+
+##疑问##
+取名Order的表映射不上
