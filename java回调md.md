@@ -12,9 +12,9 @@
 具体见例子
 
 ```java
-//接口类
+//回调类
 public interface CallBack {
-	/**回调函数*/
+//回调函数
 public void excute();
 }
 
@@ -24,7 +24,7 @@ public void excute();
 public class B implements CallBack{
 	@Override
 	public void excute() {
-		System.out.println("执行回调，（B的方法）");
+		System.out.println("执行回调");
 	}
 
 }
@@ -34,18 +34,15 @@ public class B implements CallBack{
 ```java
 public class A {
 	private CallBack callback = null;
-
 	public void setConnect(CallBack callback) {
 		this.callback = callback;
 	}
-/**做某事*/
+	//做某事
 	public void doSomething() throws InterruptedException {
-		System.out.println("开始做某事啦。。。。");
+		System.out.println("开始做某事。。。。");
 		Thread.sleep(3000);
-		System.out.println("A里边的方法又反过来调用B里边的方法");
 		//i call you back
 		callback.excute();
-		
 	}
 }
 
@@ -57,32 +54,20 @@ public class Test {
 	public static void main(String[] args) {
 		A a=new A();
 		CallBack b=new B();
-		System.out.println(" B调用A的方法");
-		//执行you call me
+		//绑定关系
 		a.setConnect(b);
-		try {
-			a.doSomething();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		//执行you call me
+		a.doSomething();
 	}
 }
 ```
-输出
-```html
- B调用A的方法
-开始做某事啦。。。。
-A里边的方法又反过来调用B里边的方法
-执行回调，（B的方法）
-```
+
 //通过匿名内部类来实现回调
 ```java
+
 public class Test {
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) {
 		A a=new A();
-		//用匿名内部类来实现
-		System.out.println(" B调用A的方法");
-//执行you call me
 		a.setConnect(new CallBack() {
 			@Override
 			public void excute() {
@@ -93,11 +78,6 @@ public class Test {
 	}
 }
 ```
-//执行结果
-```html
- B调用A的方法
-开始做某事啦。。。。
-A里边的方法又反过来调用B里边的方法
-通过匿名内部类执行回调
+you call me 的地方其实不是很固定，在我们fragment之间传值时，you call me就发生在点击EditText时，在我们选择完时间后点击确定按钮进行回调通知的
 
-```
+在Android开发中经常用到回调机制，其中最典型的就是控件被触发的实现方式，简单而言，如Button被Click后，是系统调用了OnClick方法，而我们为Button注册了OnClickListener监听器，当被触发Click后，OnClickListener中的OnClick方法就会被回调，我们就能在其中执行相应操作了。
