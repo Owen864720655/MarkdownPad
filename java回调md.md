@@ -81,3 +81,5 @@ public class Test {
 you call me 的地方其实不是很固定，在我们fragment之间传值时，you call me就发生在点击EditText时，在我们选择完时间后点击确定按钮进行回调通知的
 
 在Android开发中经常用到回调机制，其中最典型的就是控件被触发的实现方式，简单而言，如Button被Click后，是系统调用了OnClick方法，而我们为Button注册了OnClickListener监听器，当被触发Click后，OnClickListener中的OnClick方法就会被回调，我们就能在其中执行相应操作了。
+
+其实没必要这么死板，只要我们有一个回调接口，一个继承回调接口的类，有一个关系绑定函数，绑定函数的参数 是我们回调类的引用。然后在我们回调通知类中  有一个回调接口的引用，在回调通知函数中执行 CallBack.call()就完成了回调。
