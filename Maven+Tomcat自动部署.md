@@ -1,4 +1,5 @@
 ##给tomcat配置用户名密码##
+在tomcat文件夹中conf文件夹的tomcat-users.xml中进行配置
 ```xml
 <?xml version='1.0' encoding='cp936'?>
 <tomcat-users>
@@ -41,3 +42,4 @@
 ##部署应用##
 ->Run As->Maven build…->在Goals里面输入tomcat7:deploy
 **注意**：部署之前一定要把tomcat打开。
+然后在浏览器中输入http://localhost:8080/maven2/就可以访问了。
