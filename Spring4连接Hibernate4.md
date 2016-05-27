@@ -5,7 +5,8 @@
 ##步骤##
 1. 先加入Hibernate
 	1. 添加hibernate.cfg.xml
-	```xml
+	2. 
+```xml
 <!-- 配置hibernate的基本属性，方言，SQL格式化，生成数据表的策略以及二级缓存 有关数据库连接的在Spring的配置文件中通过dataSource来配置-->
 		<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 		<!-- 是否在控制台打印SQL语句 -->

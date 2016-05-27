@@ -1,0 +1,9 @@
+一个类通过注解配置为一个Bean
+再在这个类中获取ApplicationContext会不会报错
+
+在AOP通知中，四个类型通知的执行顺序 为什么每次都回有变动，没有一个固定的执行顺序吗 和通知方法写的有关系吗
+
+通过@compoment注解的类，可以在xml文件中通过ref引用吗
+
+<tx:advice
+<aop:advisor这个可不可以被afterthrowing异常通知替代

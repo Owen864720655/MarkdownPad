@@ -142,7 +142,8 @@ Session 的 save() 方法完成以下操作:
 - Session 的 delete() 方法既可以删除一个游离对象, 也可以删除一个持久化对象
 **Session 的 delete() 方法处理过程**
 	- 计划执行一条 delete 语句
-	- 把对象从 Session 缓存中删除, 该对象进入删除状态.(在flush缓存时发送delete语句中间这段时间再想对该对象进行 save或者update时就会报错，解决办法：下面)
+	- 把对象从 Session 缓存中删除, 该对象进入删除状态.(在flush缓存时发送delete语句中间这段
+	- 再想对该对象进行 save或者update时就会报错，解决办法：下面)
 **还有疑问**
 
 - Hibernate 的 cfg.xml 配置文件中有一个 hibernate.use_identifier_rollback 属性, 其默认值为 false, 若把它设为 true, 将改变 delete() 方法的运行行为: delete() 方法会把持久化对象或游离对象的 OID 设置为 null, 使它们变为临时对象.

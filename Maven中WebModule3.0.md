@@ -16,9 +16,9 @@ web.xml的命名空间声明。
 2. 右击工程Properties > Java Compiler 然后设置 “Compiler compliance level” 为1.7
  ![](http://i.imgur.com/cXkgQOp.png)
 3. 在Navigator视图下面设置.settings文件夹下的内容
-    1. org.eclipse.jdt.core.prefs设计到1.5的全部改为1.7
-	2. org.eclipse.wst.common.component将下面的version=”1.5.0”改为version=”1.7.0”
-	3. org.eclipse.wst.common.project.facet.core.xml将 installed facet=”jst.web” version=”2.3”改为installed facet=”jst.web” version=”3.0”， installed facet=”java” version=”1.5”和 installed facet=”wst.jsdt.web” version=”1.5”中的1.5改成1.7
+    1. **org.eclipse.jdt.core.prefs**设计到1.5的全部改为1.7
+	2. **org.eclipse.wst.common.component**将下面的version=”1.5.0”改为version=”1.7.0”
+	3. **org.eclipse.wst.common.project.facet.core.xml**将 installed facet=”jst.web” version=”2.3”改为installed facet=”jst.web” version=”3.0”， installed facet=”java” version=”1.5”和 installed facet=”wst.jsdt.web” version=”1.5”中的1.5改成1.7
 4. 在pom.xml中添加
 ```xml
 		<plugins>
@@ -33,4 +33,4 @@ web.xml的命名空间声明。
 			</plugin>
 		</plugins>
 ```
-## Ok烦了我一下午 ##
+## Ok烦了我一下午这里面不是每个步骤都是必须的，多试试吧 ##
