@@ -220,14 +220,14 @@ ToolBar设置返回按钮
 
 ----------
 
-##CoordinatorLayout##
+## CoordinatorLayout ##
 CoordinatorLayout 实现了多种Material Design中提到的滚动效果。目前这个框架提供了几种不用写动画代码就能工作的方法，这些效果包括：
 
 1. 让浮动操作按钮上下滑动，为Snackbar留出空间
 2. 扩展或者缩小Toolbar或者头部，让主内容区域有更多的空间
 3. 控制哪个view应该扩展还是收缩，以及其显示大小比例，包括视差滚动效果动画
 
-###响应滚动事件###
+### 响应滚动事件 ###
 1.  使用ToolBar作为actionbar
 2.  需要CoordinatorLayout作为主布局容器
 3.  接下来，我们必须使用一个容器布局：AppBarLayout来让Toolbar响应滚动事件。并且
@@ -259,7 +259,7 @@ CoordinatorLayout 实现了多种Material Design中提到的滚动效果。目�
 ```
 
 
-##ToolBar的扩展与收缩##
+## ToolBar的扩展与收缩 ##
 布局文件
 ```xml
 <android.support.design.widget.AppBarLayout
@@ -293,19 +293,29 @@ CoordinatorLayout 实现了多种Material Design中提到的滚动效果。目�
 ```
 - app:contentScrim="?attr/colorPrimary" ,CollapsingToolbarLayout这个属性是设置折叠后Toolbar的颜色.
 
-- app:layout_scrollFlags="scroll|exitUntilCollapsed" ,这是两个Flag控制滚动时候CollapsingToolbarLayout的表现.
+- 在AppBarLayout里面的View,通过app:layout_scrollFlags属性来控制,滚动时候的表现.app:layout_scrollFlags="scroll|exitUntilCollapsed" ,这是两个Flag控制滚动时候CollapsingToolbarLayout的表现.
 
 	1. Scroll,  表示向下滚动列表时候,CollapsingToolbarLayout会滚出屏幕并且消失(原文解释:this flag should be set for all views that want to scroll off the screen - for views that do not use this flag, they’ll remain pinned to the top of the screen)
 
 	2.  exitUntilCollapsed,  表示这个layout会一直滚动离开屏幕范围,直到它收折成它的最小高度.(原文解释:this flag causes the view to scroll off until it is ‘collapsed’ (its minHeight) before exiting)
 
+### CollapsingToolbarLayout的子View中可以设置这两个属性 ###
 - app:layout_collapseMode="parallax", 这是控制滚出屏幕范围的效果的
 
 	1. parallax, 表示滚动过程中,会一直保持可见区域在正中间.
+在内容滚动时，CollapsingToolbarLayout中的View（比如ImageView)也可以同时滚动，实现视差滚动效果，通常和layout_collapseParallaxMultiplier(设置视差因子)搭配使用。
+	2. pin, 表示不会被滚出屏幕范围.当CollapsingToolbarLayout完全收缩后，Toolbar还可以保留在屏幕上。
+- layout_collapseParallaxMultiplier(视差因子) - 设置视差滚动因子，值为：0~1。
 
-	2. pin, 表示不会被滚出屏幕范围.
+- 关于CollapsingToolbarLayout几个属性的介绍
+	- app:collapsedTitleTextAppearance 这是在收缩时Title文字特点外形的设置
+	- app:expandedTitleTextAppearance 同理这是在展开时Title文字特点外形的设置
+	- app:contentScrim 这是toolbar 标题工具栏停留在顶部时候背景的设置
+	- app:expandedTitleMarginStart 设置扩张时候(还没有收缩时)title向左填充的距离
+	- app:expandedTitleMarginEnd 这个同理是收缩结束时向左填空的距离
 
-##CardView##
+原文链接：http://www.jianshu.com/p/ca6fddbd0e1f
+## CardView ##
 需要在gradle中引进`compile 'com.android.support:cardview-v7:21.0.2'`
 ```xml
     <android.support.v7.widget.CardView
@@ -333,7 +343,7 @@ CardView中常用的属性有：
  		app:cardElevation="10dp"
         app:contentPadding="10dp"
 ```
-##RecyclerView##
+## RecyclerView ##
 ```xml
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
@@ -386,26 +396,5 @@ CardView中常用的属性有：
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 ```
 
