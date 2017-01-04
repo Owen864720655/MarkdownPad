@@ -8,7 +8,7 @@ Transaction和产生它的session要一起使用，当，session改变之前前�
 	
 
 
-##数据的隔离级别
+## 数据的隔离级别
 对于同时运行的多个事务, 当这些事务访问数据库中相同的数据时, 如果没有采取必要的隔离机制, 就会导致各种并发问题:  
 
 
@@ -40,9 +40,9 @@ Transaction和产生它的session要一起使用，当，session改变之前前�
 **Mysql** 支持 4 中事务隔离级别. Mysql 默认的事务隔离级别为: REPEATABLE READ  
 
 
-##flush缓存##
+## flush缓存 ##
 **flush** Session 按照缓存中*对象的属性变化*来同步更新数据库
-###默认情况下Session刷新缓存
+### 默认情况下Session刷新缓存
 
 - 显式调用 Session 的 flush() 方法 (可能会发送SQL语句，就是当对象的属性改变时，会调用UPDATE，但不会提交到数据库，也就是数据库中的内容不会改变，因为事务没有提交)
 
@@ -52,7 +52,7 @@ Transaction和产生它的session要一起使用，当，session改变之前前�
 
 - 如果对象使用 native 生成器生成 OID, 那么当调用 Session 的 save() 方法保存对象时, 会立即执行向数据库插入该实体的 insert 语句.(因为Save方法之后必须保证对象的id是存在的。因为自增，所以必须insert之后才知道id)
 
-##持久化对象的状态##
+## 持久化对象的状态 ##
 站在持久化的角度, Hibernate 把对象分为 4 种状态
 
 1. **临时对象（Transient）**: 
@@ -76,8 +76,8 @@ Session 在 flush 缓存时, 会根据持久化对象的属性变化, 来同步�
 
 ![对象的状态转换图](http://i.imgur.com/xTRBtun.png)
 
-##核心方法##
-###Session 的 save() 方法###
+## 核心方法 ##
+### Session 的 save() 方法 ###
 Session 的 save() 方法使一个临时对象转变为持久化对象
 Session 的 save() 方法完成以下操作:
 
@@ -96,7 +96,7 @@ Session 的 save() 方法完成以下操作:
 
 **persist() 和 save() 区别：**
 当对一个 OID 不为 Null 的对象执行 save() 方法时, 会把该对象以一个新的 oid 保存到数据库中;  但执行 persist() 方法时会抛出一个异常.即通过setId方法设定了一个OID再次插入时persist()会报错，而save()方法会以一个新的OID保存到数据库中.
-###Session 的 get() 和 load() 方法###
+### Session 的 get() 和 load() 方法 ###
 都可以根据跟定的 OID 从数据库中加载一个持久化对象
 区别:
 
@@ -110,7 +110,7 @@ Session 的 save() 方法完成以下操作:
 
 - Load方法可能会 抛出LazyInitializationException异常（在需要初始化代理对象之前已经关闭了Session,即要真正使用查询结果时，连接已经关掉了，因为load延迟加载)
 
-###update()方法###
+### update()方法 ###
 1. 若更新一个持久化对象，则不需要显示的调用update()方法，因为在commit()中会执行flush()操作.
 2. 更新一个游离对象，需要显示的调用update()方法，并把该对象转变为持久化对象.(游离对象，即session被重新赋值了，不是以前的session了这个时候该对象就变为一个游离对象)
 
@@ -123,7 +123,7 @@ Session 的 save() 方法完成以下操作:
 
 3. 当 update() 方法关联一个游离对象时, 如果在 Session 的缓存中已经存在相同 OID 的持久化对象, 会抛出异常(也就是在执行update方法时，要把游离对象编程持久对象，但这个时候session中已经存在了一个同样id的对象，就会报错)
 
-###saveOrUpdate()方法###
+### saveOrUpdate()方法 ###
 ![](http://i.imgur.com/yUhybo6.png)
 
 ```java
@@ -135,10 +135,10 @@ Session 的 save() 方法完成以下操作:
 		session.saveOrUpdate(news);//执行update方法如果，数据表中存在id为1的数据，不存在的话会报错
 		news.setId(2);//会报错，因为update之后对象已经编程持久对象，持久对象不允许改id
 ```
-###merge() 方法###
+### merge() 方法 ###
 遗留问题
 
-###delete()方法###
+### delete()方法 ###
 - Session 的 delete() 方法既可以删除一个游离对象, 也可以删除一个持久化对象
 **Session 的 delete() 方法处理过程**
 	- 计划执行一条 delete 语句
@@ -148,7 +148,7 @@ Session 的 save() 方法完成以下操作:
 
 - Hibernate 的 cfg.xml 配置文件中有一个 hibernate.use_identifier_rollback 属性, 其默认值为 false, 若把它设为 true, 将改变 delete() 方法的运行行为: delete() 方法会把持久化对象或游离对象的 OID 设置为 null, 使它们变为临时对象.
 
-###evict()###
+### evict() ###
 将session中的一个持久对象移除。 
 ### clear()###
 把缓冲区内的全部对象清除，但不包括操作中的对象。(疑问，操作中的状态指什么是不是如下)
@@ -161,13 +161,13 @@ Session 的 save() 方法完成以下操作:
 ``` 
 只发送了一次查询操作，evict也是同样道理？
 
-##Java 时间和日期类型的 Hibernate 映射##
+## Java 时间和日期类型的 Hibernate 映射 ##
 在 Java 中, 代表时间和日期的类型包括: java.util.Date 和 java.util.Calendar. 此外, 在 JDBC API 中还提供了 3 个扩展了 java.util.Date 类的子类: java.sql.Date, java.sql.Time 和 java.sql.Timestamp, 这三个类分别和标准 SQL 类型中的 DATE, TIME 和 TIMESTAMP 类型对应
 
 ![Java 时间和日期类型的 Hibernate 映射](http://i.imgur.com/x50G7QZ.png)
 持久化类中设置为java.util.Date，然后数据库中具体需要那种类型的根据映射类型在hbm.xml中设置
 插入的时候```new Date(new java.util.Date().getTime())``` 
-###存储图片
+### 存储图片
 图片存储为2进制格式。Blob
 在持久化类中声明private Blob image;
 InputStream stream = new FileInputStream("tp.png");
@@ -175,7 +175,7 @@ InputStream stream = new FileInputStream("tp.png");
 		Blob image = Hibernate.getLobCreator(session).createBlob(stream, stream.available());
 		news.setImage(image);
 ```
-##映射组成关系##
+## 映射组成关系 ##
 **Hibernate 把持久化类的属性分为两种: **
 - 值(value)类型: 没有 OID, 不能被单独持久化, 生命周期依赖于所属的持久化类的对象的生命周期
 
@@ -189,7 +189,7 @@ InputStream stream = new FileInputStream("tp.png");
 			<property name="yearPay" column="YEAR_PAY" type="integer"></property>
 		</component>
 ```
-##映射单向多对一关联关系##
+## 映射单向多对一关联关系 ##
 
 只需从 n 的一端可以访问 1 的一端
 
@@ -210,7 +210,7 @@ column: 设定和持久化类的属性对应的表的外键
 
 4. 如果1端关联的对象还都在，则不能删除1端。
 
-##双向1-n##
+## 双向1-n ##
 域模型:从 Order 到 Customer 的多对一双向关联需要在Order 类中定义一个 Customer 属性, 而在 Customer 类中需定义存放 Order 对象的集合属性
 在多的一头配置和单向多对一一样。
 在一的一端配置
@@ -232,9 +232,9 @@ one-to-many:1对多，设定集合属性中所关联的持久化类 class为N端
 
 3. 两边都是延迟加载，都是在用到对方时才发送SELECT语句
 
-###Set的其他属性###
+### Set的其他属性 ###
 order-by:""对查到的集合属性进行排序。可以加入sql函数
-##一对一##
+## 一对一 ##
 配置many-to-one的一端，都有一个外键。插入的时候先插入另一端再插入many端，这样不会发送update语句。查询的时候，只查询本对象，所关联的对象只有当用的时候才会发送select语句
 <many-to-one属性的类
 ###基于外键的###
@@ -255,7 +255,7 @@ order-by:""对查到的集合属性进行排序。可以加入sql函数
 
 注意：
 查询操作时，配置many-to-one的一端，在用到所关联的对象时才会发送SELECT语句，但是配置了one-to-one一端的只要查询了就会把他所关联的对象全部查询出来。
-###基于主键的###
+### 基于主键的 ###
 基于主键的映射策略:指一端的主键生成器使用 foreign 策略,表明根据”对方”的主键来生成自己的主键，自己并不能独立生成主键. <param> 子元素指定使用当前持久化类的哪个属性作为 “对方”
 ```xml
 <id name="id" type="java.lang.Integer">
@@ -282,7 +282,7 @@ constrained(约束):指定为当前持久化类对应的数据库表的主键添
 2. 在查询时，主动的一方会有一个左外连接把所关联的对象也都查出来，因为他里面没有一个外键指向所关联的对象，不知道是哪一个，所有都查出来了。
 3. 被动的一方默认只查询他所在的表，只有用到所关联的表时才会全部查询.
 
-##多对多##
+## 多对多 ##
 例子：现实生活中的类别和商品
 
 n-n双向配置。

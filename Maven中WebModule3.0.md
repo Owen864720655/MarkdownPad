@@ -34,3 +34,14 @@ web.xml的命名空间声明。
 		</plugins>
 ```
 ## Ok烦了我一下午这里面不是每个步骤都是必须的，多试试吧 ##
+## 在web.xml中 ##
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>Archetype Created Web Application</display-name>
+</web-app>
+
+```
